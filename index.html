@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亲密关系依恋模式测评（ECR）</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--tx:#25302b;--mut:#6b756f;--ac:#2f6b57;--ac2:#e8f1ed;--bd:#dcded8;--warn:#b5532f}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#171a18;--card:#212623;--tx:#e8ece9;--mut:#9aa59f;--ac:#6fc2a3;--ac2:#27352f;--bd:#363d39;--warn:#e08b66}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.7 -apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:16px}
+h1{font-size:1.6rem;margin:.2em 0 .3em}h2{font-size:1.2rem;margin:.2em 0 .6em}
+.mut{color:var(--mut);font-size:.9rem}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;padding:10px 24px}
+button.ghost{background:transparent;color:var(--ac)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.q{padding:16px 0;border-bottom:1px solid var(--bd)}.q:last-of-type{border-bottom:0}
+.q p{margin:0 0 10px}
+.scale{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.scale label{text-align:center;cursor:pointer}
+.scale input{position:absolute;opacity:0}
+.scale span{display:block;padding:8px 0;border:1px solid var(--bd);border-radius:8px;font-weight:600}
+.scale input:checked+span{background:var(--ac);color:#fff;border-color:var(--ac)}
+.scale input:focus-visible+span{outline:2px solid var(--ac);outline-offset:2px}
+.ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mut);margin-top:4px}
+.nav{display:flex;justify-content:space-between;margin-top:16px}
+.score{display:flex;gap:12px;margin:12px 0}.score div{flex:1;background:var(--ac2);border-radius:10px;padding:12px;text-align:center}
+.score b{display:block;font-size:1.8rem;color:var(--ac)}
+svg text{fill:var(--mut);font-size:11px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="intro" class="card">
+  <h1>亲密关系依恋模式测评</h1>
+  <p class="mut">基于“亲密关系经历量表”（Experiences in Close Relationships，ECR，36 题，中文修订版）</p>
+  <p>本测评用于了解你在亲密关系中的依恋倾向，从<b>依恋焦虑</b>和<b>依恋回避</b>两个维度给出得分。</p>
+  <ul>
+    <li>共 36 题，约 5–8 分钟，采用 7 点计分：1 = 非常不同意，7 = 非常同意。</li>
+    <li>请想一想你在<b>恋爱/亲密关系中的一般感受</b>，不必针对某一位具体的伴侣，凭第一直觉作答。</li>
+    <li>答案没有对错好坏。作答数据只在你的浏览器中计算，不会上传或保存。</li>
+  </ul>
+  <p class="mut">本测评仅用于教学与自我了解，不能替代专业心理评估或诊断。</p>
+  <button id="start">开始测评</button>
+</section>
+
+<section id="quiz" class="card hide">
+  <div class="bar"><i id="pg"></i></div>
+  <div class="mut" id="pgt"></div>
+  <div id="qs"></div>
+  <div class="nav"><button class="ghost" id="prev">上一页</button><button id="next">下一页</button></div>
+</section>
+
+<section id="result" class="hide">
+  <div class="card">
+    <h2>你的测评结果</h2>
+    <div class="score"><div>依恋焦虑<b id="sa"></b></div><div>依恋回避<b id="sv"></b></div></div>
+    <div style="text-align:center"><svg id="chart" viewBox="0 0 320 320" width="100%" style="max-width:340px" role="img" aria-label="依恋二维定位图"></svg></div>
+    <h2 id="tt" style="margin-top:16px"></h2>
+    <p id="td"></p>
+    <p class="mut" id="cut"></p>
+  </div>
+  <div class="card">
+    <h2>如何理解这两个维度</h2>
+    <p><b>依恋焦虑</b>：对被抛弃、被忽视的担心程度，以及对伴侣回应与确认的需求程度。得分越高，越容易担心“对方没有那么在乎我”。</p>
+    <p><b>依恋回避</b>：对亲密和依赖的不适程度。得分越高，越倾向保持距离、不愿袒露感受、不愿依赖他人。</p>
+    <p class="mut">依恋风格并不固定，会随经历、关系和自我成长而变化。结果反映的是你在这份问卷上的自我报告，而不是对你这个人的定论。</p>
+  </div>
+  <button class="ghost" id="again">重新测评</button>
+</section>
+
+<p class="mut" style="text-align:center">参考：Brennan, Clark &amp; Shaver (1998) ECR；李同归、加藤和生（2006）中文修订版</p>
+</div>
+
+<script>
+// 分界值：默认取量表中点 4，可按所在样本的常模或均值自行修改
+const CUT_A = 4, CUT_V = 4, PER_PAGE = 6;
+
+// [题目, 维度(A=焦虑, V=回避), 是否反向计分]
+const ITEMS = [
+["我不愿意向伴侣展露内心深处的感受。","V",0],
+["我担心被抛弃。","A",0],
+["我和恋爱伴侣亲近时感到很自在。","V",1],
+["我非常担心自己的恋爱关系。","A",0],
+["就在伴侣开始向我靠近的时候，我发现自己想要退缩。","V",0],
+["我担心伴侣对我的在乎不如我对他/她的在乎。","A",0],
+["当伴侣想要和我非常亲密时，我会感到不舒服。","V",0],
+["我相当担心会失去伴侣。","A",0],
+["我不习惯向伴侣敞开心扉。","V",0],
+["我常常希望伴侣对我的感情能像我对他/她的感情一样强烈。","A",0],
+["我想和伴侣亲近，但又总是退缩。","V",0],
+["我常常想与伴侣完全融为一体，而这有时会把对方吓跑。","A",0],
+["当伴侣和我过于亲近时，我会感到紧张。","V",0],
+["我担心自己孤单一人。","A",0],
+["我能自在地与伴侣分享我内心的想法和感受。","V",1],
+["我渴望非常亲密的愿望有时会把人吓跑。","A",0],
+["我尽量避免与伴侣过于亲近。","V",0],
+["我需要伴侣一再向我保证他/她爱我。","A",0],
+["我觉得与伴侣亲近相对比较容易。","V",1],
+["有时我觉得自己在迫使伴侣表达更多的感情、做出更多的承诺。","A",0],
+["我觉得让自己依赖伴侣很困难。","V",0],
+["我不常担心被抛弃。","A",1],
+["我不喜欢与伴侣过于亲近。","V",0],
+["如果我无法让伴侣对我表现出兴趣，我会难过或生气。","A",0],
+["我几乎什么事情都会告诉伴侣。","V",1],
+["我发现伴侣不愿意像我希望的那样亲近。","A",0],
+["我会和伴侣讨论我的问题和烦恼。","V",1],
+["当我没有处在恋爱关系中时，我会感到有些焦虑和不安全。","A",0],
+["我能自在地依赖伴侣。","V",1],
+["当伴侣不能像我希望的那样经常陪在我身边时，我会感到沮丧。","A",0],
+["我不介意向伴侣寻求安慰、建议或帮助。","V",1],
+["当我需要伴侣时他/她不在，我会感到沮丧。","A",0],
+["在需要的时候求助于伴侣是有帮助的。","V",1],
+["当伴侣不认可我时，我会对自己感觉很糟。","A",0],
+["我在很多事情上都会求助伴侣，包括寻求安慰和保证。","V",1],
+["当伴侣不和我在一起而是花时间在别处时，我会感到怨恨。","A",0]
+];
+
+const TYPES = {
+ secure:["安全型（低焦虑 · 低回避）","你在亲密关系中通常比较自在：既能接近他人、依赖他人，也不太担心被抛弃。遇到冲突或需要支持时，往往能坦诚表达需要，也能容纳对方的独立。"],
+ preoc:["焦虑型／痴迷型（高焦虑 · 低回避）","你渴望亲密与确认，对关系的变化很敏感，容易担心对方不够在乎自己，需要较多的回应与保证。觉察自己的担心从何而来，并学会直接表达需要，会对关系很有帮助。"],
+ dism:["回避型／疏离型（低焦虑 · 高回避）","你重视独立与自主，倾向于自己消化情绪，在对方要求更多亲密或依赖时容易感到不适、想拉开距离。尝试在安全的范围内多袒露一点感受，可能会带来新的体验。"],
+ fear:["恐惧型（高焦虑 · 高回避）","你既渴望亲密，又对亲密感到不安：一方面担心被抛弃，另一方面又害怕靠近后受伤，因此容易在“靠近”和“退缩”之间摇摆。了解这种内在冲突，是改变的第一步。"]
+};
+
+const $ = id => document.getElementById(id);
+const ans = new Array(ITEMS.length).fill(0);
+let page = 0;
+const pages = Math.ceil(ITEMS.length / PER_PAGE);
+const show = id => ["intro","quiz","result"].forEach(s => $(s).classList.toggle("hide", s !== id));
+
+function render(){
+  const from = page * PER_PAGE, to = Math.min(from + PER_PAGE, ITEMS.length);
+  let h = "";
+  for(let i = from; i < to; i++){
+    h += `<div class="q"><p><b>${i+1}.</b> ${ITEMS[i][0]}</p><div class="scale">`;
+    for(let v = 1; v <= 7; v++)
+      h += `<label><input type="radio" name="q${i}" value="${v}" ${ans[i]===v?"checked":""}><span>${v}</span></label>`;
+    h += `</div><div class="ends"><span>非常不同意</span><span>非常同意</span></div></div>`;
+  }
+  $("qs").innerHTML = h;
+  $("qs").querySelectorAll("input").forEach(el => el.onchange = () => {
+    ans[+el.name.slice(1)] = +el.value; update();
+  });
+  update();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function update(){
+  const from = page * PER_PAGE, to = Math.min(from + PER_PAGE, ITEMS.length);
+  const done = ans.filter(Boolean).length;
+  $("pg").style.width = done / ITEMS.length * 100 + "%";
+  $("pgt").textContent = `已完成 ${done} / ${ITEMS.length} 题`;
+  $("prev").disabled = page === 0;
+  $("next").textContent = page === pages - 1 ? "查看结果" : "下一页";
+  $("next").disabled = ans.slice(from, to).some(v => !v);
+}
+function calc(){
+  let a = 0, v = 0, na = 0, nv = 0;
+  ITEMS.forEach(([_, d, r], i) => {
+    const s = r ? 8 - ans[i] : ans[i];
+    if(d === "A"){ a += s; na++; } else { v += s; nv++; }
+  });
+  return [a / na, v / nv];
+}
+function showResult(){
+  const [a, v] = calc();
+  $("sa").textContent = a.toFixed(2);
+  $("sv").textContent = v.toFixed(2);
+  const k = a < CUT_A ? (v < CUT_V ? "secure" : "dism") : (v < CUT_V ? "preoc" : "fear");
+  $("tt").textContent = TYPES[k][0];
+  $("td").textContent = TYPES[k][1];
+  $("cut").textContent = `得分为各维度 18 题的平均分（1–7）。类型按分界值划分：焦虑 ${CUT_A}、回避 ${CUT_V}，仅作教学参考；分类是为了便于理解，实际上依恋是连续的维度。`;
+  drawChart(a, v);
+  show("result");
+  window.scrollTo({top:0});
+}
+function drawChart(a, v){
+  const L = 40, S = 260, p = x => L + (x - 1) / 6 * S, q = y => 20 + S - (y - 1) / 6 * S;
+  const cx = p(CUT_V), cy = q(CUT_A);
+  const c = (id, x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle">${t}</text>`;
+  $("chart").innerHTML =
+   `<rect x="${L}" y="20" width="${S}" height="${S}" fill="none" stroke="var(--bd)"/>
+    <line x1="${cx}" y1="20" x2="${cx}" y2="${20+S}" stroke="var(--bd)" stroke-dasharray="4"/>
+    <line x1="${L}" y1="${cy}" x2="${L+S}" y2="${cy}" stroke="var(--bd)" stroke-dasharray="4"/>
+    ${c(0,(L+cx)/2,(20+S+cy)/2,"安全型")}${c(0,(cx+L+S)/2,(20+S+cy)/2,"回避型")}
+    ${c(0,(L+cx)/2,(20+cy)/2,"焦虑型")}${c(0,(cx+L+S)/2,(20+cy)/2,"恐惧型")}
+    ${c(0,L+S/2,312,"依恋回避 →")}
+    <text transform="translate(12,${20+S/2}) rotate(-90)" text-anchor="middle">依恋焦虑 →</text>
+    <text x="${L}" y="${20+S+14}" text-anchor="middle">1</text><text x="${L+S}" y="${20+S+14}" text-anchor="middle">7</text>
+    <text x="${L-8}" y="${20+S}" text-anchor="end">1</text><text x="${L-8}" y="28" text-anchor="end">7</text>
+    <circle cx="${p(v)}" cy="${q(a)}" r="8" fill="var(--warn)" stroke="#fff" stroke-width="2"/>`;
+}
+
+$("start").onclick = () => { show("quiz"); render(); };
+$("prev").onclick = () => { page--; render(); };
+$("next").onclick = () => { if(page === pages - 1) showResult(); else { page++; render(); } };
+$("again").onclick = () => { ans.fill(0); page = 0; show("intro"); window.scrollTo({top:0}); };
+</script>
+</body>
+</html>
